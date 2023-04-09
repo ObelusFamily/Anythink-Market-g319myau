@@ -23,7 +23,3 @@ ITEM_IS_NOT_FAVORITED = "item is not favorited"
 COMMENT_DOES_NOT_EXIST = "comment does not exist"
 
 AUTHENTICATION_REQUIRED = "authentication required"
-
-# OPEN AI DATA
-OPEN_AI_IMAGE_SIZE = '256x256'
-OPEN_AI_URL = 'https://api.openai.com/v1/images/generations'
