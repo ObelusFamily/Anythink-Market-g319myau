@@ -2,6 +2,9 @@ from typing import Optional
 
 from fastapi import APIRouter, Body, Depends, HTTPException, Response
 from starlette import status
+import requests
+import json
+import os
 
 from app.api.dependencies.items import (
     check_item_modification_permissions,
@@ -68,6 +71,8 @@ async def create_new_item(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=strings.ITEM_ALREADY_EXISTS,
         )
+    if item_create.image is None:
+        item_create.image = generate_image(item_create)
     item = await items_repo.create_item(
         slug=slug,
         title=item_create.title,
@@ -120,3 +125,19 @@ async def delete_item_by_slug(
     items_repo: ItemsRepository = Depends(get_repository(ItemsRepository)),
 ) -> None:
     await items_repo.delete_item(item=item)
+
+def generate_image(item_create: ItemInCreate) -> str:
+    open_ai_request = {
+        'prompt': item_create.title,
+        'n': 1,
+        'size': strings.OPEN_AI_IMAGE_SIZE
+    }
+    headers = {
+        'Content-Type': 'application/json', 
+        'Authorization': 'Bearer {auth_key}'.format(auth_key = os.environ['OPENAI_API_KEY'])
+        }
+    response = requests.post(url=strings.OPEN_AI_URL, json=open_ai_request, headers=headers)
+    print(response.text)
+    if response.status_code != 200:
+        return None
+    return json.loads(response.text)['data'][0]['url']
