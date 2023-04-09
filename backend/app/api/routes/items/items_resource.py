@@ -71,7 +71,7 @@ async def create_new_item(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=strings.ITEM_ALREADY_EXISTS,
         )
-    if item_create.image is None:
+    if item_create.image is None or item_create.image == '':
         item_create.image = generate_image(item_create)
     item = await items_repo.create_item(
         slug=slug,
